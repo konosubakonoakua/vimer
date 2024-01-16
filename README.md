@@ -1786,6 +1786,64 @@ autocmd ColorScheme lucius highlight StatusLine ctermbg=darkgray cterm=NONE guib
 ### 退出时返回错误码（防止意外产生 git 提交）
 
 当我们使用 vim 编辑提交记录的时候，如果突然不想提交了，可以使用 `:cq` 来让 vim 退出的时候返回错误，从而避免一次无意义的提交。
+### neovim 集成 lazygit
+**Using neovim-remote**
+
+If you have [neovim-remote](https://github.com/mhinz/neovim-remote) and have configured to use it in neovim, it'll launch the commit editor inside your neovim instance when you use `C` inside `lazygit`.
+
+1. `pip install neovim-remote`
+
+2. Add the following to your `~/.bashrc`:
+
+```bash
+if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
+    alias nvim=nvr -cc split --remote-wait +'set bufhidden=wipe'
+fi
+```
+
+3. Set `EDITOR` environment variable in `~/.bashrc`:
+
+```bash
+if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
+    export VISUAL="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+    export EDITOR="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+else
+    export VISUAL="nvim"
+    export EDITOR="nvim"
+fi
+```
+
+4. Add the following to `~/.vimrc`:
+
+```vim
+if has('nvim') && executable('nvr')
+  let $GIT_EDITOR = "nvr -cc split --remote-wait +'set bufhidden=wipe'"
+endif
+```
+
+If you have `neovim-remote` and don't want `lazygit.nvim` to use it, you can disable it using the following configuration option:
+
+```vim
+let g:lazygit_use_neovim_remote = 0
+```
+
+**Using nvim --listen and nvim --server to edit files in same process**
+
+You can use vanilla nvim server to edit files in the same nvim instance when you use `e` inside `lazygit`.
+
+1. You have to start nvim with the `--listen` parameter. An easy way to ensure this is to use an alias:
+```bash
+# ~/.bashrc
+alias vim='nvim --listen /tmp/nvim-server.pipe'
+```
+
+2. You have to modify lazygit to attempt connecting to existing nvim instance on edit:
+```yml
+# ~/.config/jesseduffield/lazygit/config.yml
+os:
+  editCommand: 'nvim'
+  editCommandTemplate: '{{editor}} --server /tmp/nvim-server.pipe --remote-tab "$(pwd)/{{filename}}"'
+```
 
 # 调试
 
