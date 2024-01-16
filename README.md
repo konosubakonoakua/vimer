@@ -1783,6 +1783,9 @@ autocmd ColorScheme lucius highlight StatusLine ctermbg=darkgray cterm=NONE guib
 （实测 neovim/vim8 下没问题）
 
 帮助文档：`:h :redir`
+### 退出时返回错误码（防止意外产生 git 提交）
+
+当我们使用 vim 编辑提交记录的时候，如果突然不想提交了，可以使用 `:cq` 来让 vim 退出的时候返回错误，从而避免一次无意义的提交。
 
 # 调试
 
